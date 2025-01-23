@@ -134,7 +134,7 @@ static void print_usage() {{
 #define MAX_ARRAY_SIZE 100 // Adjust as needed
 
 // Parameter types
-typedef enum { PARAM_REAL, PARAM_INT, PARAM_CHARARRAY, PARAM_REAL_ARRAY, PARAM_INT_ARRAY } param_type;
+typedef enum { PARAM_REAL, PARAM_INT, PARAM_BOOL, PARAM_CHARARRAY, PARAM_REAL_ARRAY, PARAM_INT_ARRAY, PARAM_BOOL_ARRAY } param_type;
 
 // Parameter descriptor struct
 typedef struct {
@@ -185,6 +185,13 @@ param_descriptor param_table[] = {
                 buffer_size = int(cparam_type.split("[")[1].split("]")[0])
                 array_size = 0  # Set array_size to 0 for char arrays
                 found_chararray = True
+            elif "bool[" in cparam_type or "bool [" in cparam_type:
+                param_type = "PARAM_BOOL_ARRAY"
+                array_size = int(cparam_type.split("[")[1].split("]")[0])
+                found_boolean = True
+            elif "bool" in cparam_type:
+                param_type = "PARAM_BOOL"
+                found_boolean = True
             else:
                 continue  # Skip unsupported types
 
@@ -563,11 +570,17 @@ static void read_boolean(const char *value, bool *result, const char *param_name
     }}
 """
         elif param_type == "PARAM_INT":
-            assignment_code += f"""
-    {prefix} (param_desc->index == {index}) {{
-        read_integer(values_array[0], &commondata->{param_name}, "{param_name}");
-    }}
-"""
+            assignment_code += (
+                f"        {prefix} (param_desc->index == {index}) {{\n"
+                f'            read_integer(values_array[0], &commondata->{param_name}, "{param_name}");\n'
+                f"        }}\n"
+            )
+        elif param_type == "PARAM_BOOL":
+            assignment_code += (
+                f"        {prefix} (param_desc->index == {index}) {{\n"
+                f'            read_boolean(values_array[0], &commondata->{param_name}, "{param_name}");\n'
+                f"        }}\n"
+            )
         elif param_type == "PARAM_CHARARRAY":
             assignment_code += f"""
     {prefix} (param_desc->index == {index}) {{
@@ -583,13 +596,21 @@ static void read_boolean(const char *value, bool *result, const char *param_name
     }}
 """
         elif param_type == "PARAM_INT_ARRAY":
-            assignment_code += f"""
-    {prefix} (param_desc->index == {index}) {{
-        for (int i = 0; i < {array_size}; i++) {{
-            read_integer(values_array[i], &commondata->{param_name}[i], "{param_name}");
-        }}
-    }}
-"""
+            assignment_code += (
+                f"        {prefix} (param_desc->index == {index}) {{\n"
+                f"            for (int i = 0; i < {array_size}; i++) {{\n"
+                f'                read_integer(values_array[i], &commondata->{param_name}[i], "{param_name}");\n'
+                f"            }}\n"
+                f"        }}\n"
+            )
+        elif param_type == "PARAM_BOOL_ARRAY":
+            assignment_code += (
+                f"        {prefix} (param_desc->index == {index}) {{\n"
+                f"            for (int i = 0; i < {array_size}; i++) {{\n"
+                f'                read_boolean(values_array[i], &commondata->{param_name}[i], "{param_name}");\n'
+                f"            }}\n"
+                f"        }}\n"
+            )
 
     # Add the assignment code and the else block
     body += assignment_code

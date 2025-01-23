@@ -207,7 +207,7 @@ VALGRIND_CFLAGS = {CFLAGS_dict["debug"]}
 {LDFLAGS_str}
 """
     if not CC == "nvcc":
-        Makefile_str += f"""
+        Makefile_str += """
 # Check for OpenMP support
 OPENMP_FLAG = -fopenmp
 COMPILER_SUPPORTS_OPENMP := $(shell echo | $(CC) $(OPENMP_FLAG) -E - >/dev/null 2>&1 && echo YES || echo NO)

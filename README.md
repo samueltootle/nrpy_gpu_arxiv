@@ -2,6 +2,33 @@
 
 # NRPy 2: Python/SymPy-Based Code Generation for Numerical Relativity... and Beyond!
 
+# Generating NRPyEllipticGPU
+
+```
+git clone https://github.com/samueltootle/nrpy_gpu_arxiv.git
+```
+
+Next, you'll want to make sure your development environment is setup accordingly
+```
+cd nrpy
+pip install -U -r requirements.txt
+```
+
+Finally, to run anything in the NRPy repo, you'll need to set your `PYTHONPATH` appropriately. If you're using bash, attach the following line to the bottom of your `.bashrc` file:
+```
+export PYTHONPATH=$PYTHONPATH:.
+```
+
+Once this is set up, you can generate any of the examples from this repo, including NRPyEllipticGPU
+```
+python3 -m nrpy.examples.nrpyelliptic_conformally_flat_cuda
+```
+
+The code will be generated and stored in
+```
+project/nrpyelliptic_conformally_flat_cuda/
+```
+
 ## Quick start, Step 1:
 
 ```
@@ -37,6 +64,10 @@ pip install nrpy
   - **Binary black hole initial data, courtesy NRPyElliptic**:
     ```
     python3 -m nrpy.examples.nrpyelliptic_conformally_flat
+    ```
+  - **Binary black hole initial data, courtesy NRPyEllipticGPU**:
+    ```
+    python3 -m nrpy.examples.nrpyelliptic_conformally_flat_cuda
     ```
 
 ### Einstein Toolkit infrastructure: Choose a project to build, run the provided command. Check the `examples/et_*` directory for a ThornList and parameter file. Thorns will be output to `project/`
